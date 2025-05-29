@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.kotlin.hilt)
 }
 
 android {
@@ -56,4 +58,20 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Hilt
+    implementation(libs.android.hilt)
+    ksp(libs.android.hilt.compiler)
+
+    // Room
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room)
+    implementation(libs.androidx.room.ktx)
+
+    // Retrofit
+    implementation(libs.android.retrofit)
+    implementation(libs.android.retrofit.gson)
+
+    // Coil
+    implementation(libs.android.coil)
 }
