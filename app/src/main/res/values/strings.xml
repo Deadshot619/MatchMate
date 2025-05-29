@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MatchMate</string>
+
+    <string name="title_home_screen">Profile Matches</string>
+    <string name="status_accepted">Accepted</string>
+    <string name="status_declined">Declined</string>
+
+</resources>
