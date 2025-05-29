@@ -1,4 +1,9 @@
 package com.pankaj.matchmate.ui.screens.home
 
-fun ProfileCard() {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun ProfileCard(
+
+) {
 }
