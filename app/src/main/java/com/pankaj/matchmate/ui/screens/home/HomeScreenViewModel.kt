@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.pankaj.matchmate.repository.Result
+import com.pankaj.matchmate.repository.db.MatchStatus
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
@@ -28,7 +28,7 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun getMatches() {
         viewModelScope.launch(Dispatchers.IO) {
-            matchesRepository.getMatches().flowOn(Dispatchers.IO).collect { result ->
+            matchesRepository.getMatches(10).collect { result ->
                 when (result) {
                     is Result.Loading -> _uiState.value = HomeScreenUiState.Loading
                     is Result.Success -> _uiState.value = HomeScreenUiState.Success(
@@ -37,6 +37,12 @@ class HomeScreenViewModel @Inject constructor(
                     is Result.Error -> _uiState.value = HomeScreenUiState.Error(result.message ?: "")
                 }
             }
+        }
+    }
+
+    fun updateMatch(id: String, matchStatus: MatchStatus) {
+        viewModelScope.launch(Dispatchers.IO) {
+            matchesRepository.updateMatchStatus(id, matchStatus)
         }
     }
 }

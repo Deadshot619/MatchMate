@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,10 +80,10 @@ fun HomeScreen(
                             userDomain = user,
                             status = user.matchStatus,
                             onAccept = {
-
+                                viewModel.updateMatch(user.id, MatchStatus.ACCEPTED)
                             },
                             onDecline = {
-
+                                viewModel.updateMatch(user.id, MatchStatus.DECLINED)
                             }
                         )
                     }
@@ -105,38 +106,42 @@ fun MatchCard(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(userDomain.photoUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(72.dp).clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(userDomain.name, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        text = "Age: ${userDomain.age} • Location: ${userDomain.location}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = ImageRequest.Builder(context = LocalContext.current)
+                    .data(userDomain.photoUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Profile Picture",
+                modifier = Modifier.size(256.dp).clip(RoundedCornerShape(16.dp)),
+                alignment = Alignment.Center,
+            )
+            Spacer(modifier = Modifier.size(12.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = userDomain.name,
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Age: ${userDomain.age} • Location: ${userDomain.location}",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
             Spacer(modifier = Modifier.height(12.dp))
             when (status) {
-                MatchStatus.ACCEPTED -> StatusBanner("Member Accepted", Color(0xFF4CAF50))
-                MatchStatus.DECLINED -> StatusBanner("Member Declined", Color(0xFFF44336))
+                MatchStatus.ACCEPTED -> StatusBanner(stringResource(R.string.status_accepted), Color(0xFF4CAF50))
+                MatchStatus.DECLINED -> StatusBanner(stringResource(R.string.status_declined), Color(0xFFF44336))
                 else -> Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedButton(onClick = onDecline, modifier = Modifier.weight(1f)) {
-                        Text("Decline")
+                        Text(stringResource(R.string.btn_decline))
                     }
                     Button(onClick = onAccept, modifier = Modifier.weight(1f)) {
-                        Text("Accept")
+                        Text(stringResource(R.string.btn_accept))
                     }
                 }
             }

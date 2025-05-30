@@ -5,4 +5,7 @@
     <string name="status_accepted">Accepted</string>
     <string name="status_declined">Declined</string>
 
+    <string name="btn_accept">Accept</string>
+    <string name="btn_decline">Decline</string>
+
 </resources>

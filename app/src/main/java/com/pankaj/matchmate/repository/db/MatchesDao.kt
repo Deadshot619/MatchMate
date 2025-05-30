@@ -12,6 +12,9 @@ interface MatchesDao {
     @Query("SELECT * FROM matches")
     fun getAllMatches(): Flow<List<MatchEntity>>
 
+    @Query("SELECT * FROM matches WHERE id = :id")
+    fun getParticularMatch(id: String): MatchEntity
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(matches: List<MatchEntity>)
 
