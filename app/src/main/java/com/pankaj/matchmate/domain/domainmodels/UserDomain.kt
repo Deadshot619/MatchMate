@@ -1,4 +1,4 @@
-package com.pankaj.matchmate.domain
+package com.pankaj.matchmate.domain.domainmodels
 
 import com.pankaj.matchmate.repository.db.MatchEntity
 import com.pankaj.matchmate.repository.db.MatchStatus
@@ -14,7 +14,7 @@ data class UserDomain(
 
 fun MatchEntity.toUserDomain() = UserDomain(
     id = id,
-    name = name,
+    name = "$firstName $lastName",
     age = age,
     location = location,
     photoUrl = photoUrl,

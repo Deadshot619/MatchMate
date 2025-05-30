@@ -1,7 +1,5 @@
 package com.pankaj.matchmate.network.models
 
-import com.pankaj.matchmate.repository.db.MatchEntity
-
 data class MatchesResponse(
     val results: List<MatchesModel>
 )

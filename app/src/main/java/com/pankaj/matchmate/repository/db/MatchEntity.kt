@@ -9,7 +9,8 @@ enum class MatchStatus { ACCEPTED, DECLINED, NONE }
 @Entity(tableName = "matches")
 data class MatchEntity(
     @PrimaryKey val id: String,
-    val name: String,
+    val firstName: String,
+    val lastName: String,
     val age: Int,
     val location: String,
     val photoUrl: String,
@@ -18,7 +19,8 @@ data class MatchEntity(
 
 fun MatchesModel.toMatchEntity(): MatchEntity = MatchEntity(
     id = login.uuid,
-    name = "${name.first} ${name.last}",
+    firstName = name.first,
+    lastName = name.last,
     age = dob.age,
     location = location.city,
     photoUrl = picture.large
