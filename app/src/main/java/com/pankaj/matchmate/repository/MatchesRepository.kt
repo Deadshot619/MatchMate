@@ -5,6 +5,7 @@ import com.pankaj.matchmate.repository.db.MatchEntity
 import com.pankaj.matchmate.repository.db.MatchStatus
 import com.pankaj.matchmate.repository.db.MatchesDao
 import com.pankaj.matchmate.repository.db.toMatchEntity
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -12,18 +13,18 @@ class MatchesRepository @Inject constructor(
     private val api: MatchApi,
     private val matchesDao: MatchesDao
 ) {
-    suspend fun getMatches(numItems: Int) = flow<Result<List<MatchEntity>>> {
+    val matchesList = matchesDao.getAllMatches()
+
+    fun fetchAndSaveMatches(numItems: Int) = flow<Result<Boolean>> {
         emit(Result.Loading())
 
         try {
             val response = api.getMatches(numItems)
             val matches = response.results.map { it.toMatchEntity() }
             matchesDao.insertAll(matches)
-            matchesDao.getAllMatches().collect {
-                emit(Result.Success(it))
-            }
+            emit(Result.Success(data = true))
         } catch (e: Exception) {
-            emit(Result.Error(e.message ?: "Unknown error"))
+            emit(Result.Error(data = false, message = e.message ?: "Unknown error"))
         }
     }
 

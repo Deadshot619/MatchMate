@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -22,10 +20,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pankaj.matchmate.R
@@ -46,35 +46,48 @@ import com.pankaj.matchmate.repository.db.MatchStatus
 @Composable
 fun HomeScreen(
     modifier: Modifier,
+    snackbarHostState: SnackbarHostState,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isConnected) {
+        if(isConnected) {
+            if(uiState.isLoading.not() && uiState.matches.isEmpty())
+                viewModel.getMatches()
+            snackbarHostState.showSnackbar("Internet Connected")
+        } else {
+            snackbarHostState.showSnackbar("No Internet Connection, Please connect to internet.")
+        }
+    }
 
     Column(modifier = modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        when (val state = uiState.value) {
-            is HomeScreenUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            is HomeScreenUiState.Error -> {
+        when  {
+            uiState.isError && uiState.errorMessage.isNotEmpty() && uiState.matches.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
                         fontSize = TextUnit(16f, TextUnitType.Sp),
-                        text = state.message
+                        text = uiState.errorMessage
                     )
                 }
             }
-            is HomeScreenUiState.Success -> {
+            uiState.isLoading && uiState.matches.isEmpty() && uiState.isError.not() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            uiState.matches.isNotEmpty() -> {
                 Text(
                     modifier = Modifier.padding(vertical = 16.dp),
                     fontSize = TextUnit(24f, TextUnitType.Sp),
                     text = stringResource(R.string.title_home_screen)
                 )
                 LazyColumn {
-                    items(state.matches, key = { it.id }) { user ->
+                    items(uiState.matches, key = { it.id }) { user ->
                         MatchCard(
                             modifier = Modifier,
                             userDomain = user,
